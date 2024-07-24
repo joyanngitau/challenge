@@ -1,40 +1,45 @@
-import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { axiosInstance } from '../../api/apiConfig'
+import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { axiosInstance } from '../../api/apiConfig';
 
 export default function Register() {
-    const navigate = useNavigate()
-    const [loading, setLoading] = useState(false)
-    const first_name = useRef()
-    const last_name = useRef()
-    const email = useRef()
-    const password = useRef()
-    const password2 = useRef(undefined)
-
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const first_name = useRef();
+    const last_name = useRef();
+    const email = useRef();
+    const password = useRef();
+    const password2 = useRef();
+    const ethereum_wallet = useRef();  // New reference for Ethereum wallet address
 
     async function onSubmitForm(event) {
-        event.preventDefault()
+        event.preventDefault();
         const data = {
             first_name: first_name.current.value,
             last_name: last_name.current.value,
             email: email.current.value,
             password: password.current.value,
-            password2: password2.current.value
-          };
-
-        setLoading(true)
-
+            password2: password2.current.value,
+            eth_wallet: ethereum_wallet.current.value  // Use 'eth_wallet' here
+        };
+    
+        setLoading(true);
+    
         try {
-            const response = await axiosInstance.post('auth/register', JSON.stringify(data))
-
-            setLoading(false)
-
-            navigate('/auth/login')
+            const response = await axiosInstance.post('auth/register', JSON.stringify(data), {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            setLoading(false);
+            navigate('/auth/login');
         } catch (error) {
-            setLoading(false)
+            setLoading(false);
             // TODO: handle errors
+            console.error("Registration error:", error);
         }
     }
+    
 
     return (
         <div className='container'>
@@ -56,9 +61,12 @@ export default function Register() {
                     <input type="password" placeholder='Confirm Password' autoComplete='off' className='form-control' id="passwordConfirmation" ref={password2} />
                 </div>
                 <div className="mb-3">
+                    <input type="text" placeholder='Ethereum Wallet Address' autoComplete='off' className='form-control' id="ethereum_wallet" ref={ethereum_wallet} /> 
+                </div>
+                <div className="mb-3">
                     <button disabled={loading} className='btn btn-success' type="submit">Register</button>
                 </div>
             </form>
         </div>
-    )
+    );
 }
